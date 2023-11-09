@@ -1,0 +1,332 @@
+﻿
+<!DOCTYPE html>
+<html ng-app="myApp">
+<head>
+    <title>Eliminar datos en AngularJS</title>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.9/angular.min.js"></script>
+</head>
+<body ng-app="myApp" ng-controller="myCtrl">
+
+    <h2 class="text-center">CRUD  giro</h2>
+    <br />
+    <div ng-controller="myCtrl">
+
+
+        <form name="myForm" novalidate class="text-center">
+
+            <label for="GIR_GIRO_ID">GIR_GIRO_ID:</label>
+            <input type="text" id="GIR_GIRO_ID" ng-disabled="true" ng-model="objetoParametros.GIR_GIRO_ID"><br><br>
+
+
+            <label for="GIR_RECIBO">GIR_RECIBO:</label>
+            <input type="text" id="GIR_RECIBO" ng-model="objetoParametros.GIR_RECIBO"><br><br>
+
+
+            <select ng-model="objetoParametros.GIR_CIUDAD_ID" ng-options=" CIUDADES.id_ciudad as    CIUDADES.nombre for CIUDADES in articulos3">
+                <option value="">Selecciona una empresa</option>
+            </select>
+
+
+            <br />
+            <br />
+
+            <button class="btn-danger" ng-click="submitForm(objetoParametros)">Guardar</button>
+            <br />
+            <br />
+
+            <button ng-click="limpiar(objetoParametros)">Limpiar</button>
+            <br />
+            <br />
+            <button class="btn-success" ng-click="update(objetoParametros,a.GIR_GIRO_ID)">Actualizar</button>
+
+
+        </form>
+
+
+
+        <table class="table">
+            <tr>
+                <th>
+                    Id
+                </th>
+                <th>
+                    Descripcion
+                </th>
+
+
+                <th>
+                    id_ciudad
+                </th>
+
+
+            </tr>
+
+
+            <tr ng-repeat="a in articulos2 " ng-click="seleccionarPersona(a)">
+
+
+                <td>
+                    {{a.GIR_GIRO_ID}}
+
+
+
+
+                </td>
+                <td>
+                    {{a.GIR_RECIBO}}
+
+
+
+
+                </td>
+
+
+                <td>
+                    {{a.GIR_CIUDAD_ID}}
+
+
+
+
+                </td>
+
+
+
+                <td>
+                    <button class="btn-danger" ng-click=" deleteItem(a);delete(a.GIR_GIRO_ID) ">Eliminar</button>
+
+                </td>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+            </tr>
+
+
+        </table>
+
+
+
+
+
+
+
+        @*<form>
+                <input type="text" ng-disabled="true" ng-model="objetoParametros.Id">
+                <input type="text" ng-model="objetoParametros.Descripcion">
+                <input type="text" ng-model="objetoParametros.Marca">
+                <input type="text" ng-model="objetoParametros.Cantidad">
+                <input type="text" ng-model="objetoParametros.Precio">
+                <button ng-click="update(objetoParametros,a.Id)">Actualizar</button>
+                <button ng-click="limpiar(objetoParametros)">Limpiar</button>
+
+            </form>*@
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    </div>
+    <script>
+        var app = angular.module('myApp', []);
+        app.controller('myCtrl', function ($scope, $http) {
+
+
+            $scope.objetoParametros = {
+                GIR_GIRO_ID: '',
+                GIR_RECIBO: '',
+                GIR_CIUDAD_ID: ''
+
+
+
+            };
+
+
+
+            $http.get('/api/Ciudad').then(function (response) {
+                
+                $scope.articulos3 = response.data;
+
+            });
+
+
+
+            $http.get('/api/Giro').then(function (response) {
+
+                $scope.articulos2 = response.data;
+
+            });
+
+            $scope.seleccionarPersona = function (a) {
+                
+                $scope.objetoParametros = a;
+            };
+
+
+
+            $scope.limpiar = function (objetoParametros) {
+
+                objetoParametros.GIR_GIRO_ID = '',
+                    objetoParametros.GIR_RECIBO = '',
+                    objetoParametros.GIR_CIUDAD_ID = ''
+
+
+
+            };
+
+
+
+
+            $scope.update = function (parametros, id) {
+                
+                gir_giro_id: parametros.GIR_GIRO_ID,
+
+
+
+                    $http.put('/api/Giro/' + parametros.GIR_GIRO_ID, parametros).then(function (response) {
+                        console.log('Object updated successfully!');
+                    }, function (error) {
+                        console.error('Error updating object:', error);
+                    });
+
+            };
+
+
+
+
+
+            //agregar
+            $scope.submitForm = function (parametros) {
+                
+                if (parametros.GIR_RECIBO != '' && parametros.GIR_CIUDAD_ID != '') {
+                    var data = {
+                        /*id: $scope.Id,*/
+                        gir_recibo: parametros.GIR_RECIBO,
+                        gir_ciudad_id: parametros.GIR_CIUDAD_ID
+                    };
+                    $http.post('/api/Giro', data).then(function (response) {
+
+                        console.log(response.data);
+                        $scope.articulos2.push(response.data);
+                    });
+
+
+                    Swal.fire({
+                        position: 'top-center',
+                        icon: 'success',
+                        title: 'guardado con exito',
+                        showConfirmButton: false,
+                        timer: 2000
+
+                    })
+
+                }
+                else {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Oops...',
+                        text: 'Porfavor llenar todos los campos!',
+
+                    })
+                }
+              
+
+
+            };
+
+
+
+
+
+            //eliminar
+            $scope.delete = function (id) {
+                
+                $http.delete('/api/Giro/' + id)
+                    .success(function (data) {
+                        console.log(data);
+
+                    })
+                    .error(function (data) {
+                        console.log('Error: ' + data);
+                    });
+            };
+
+            $scope.deleteItem = function (a) {
+                var index = $scope.articulos2.indexOf(a);
+                $scope.articulos2.splice(index, 1);
+            };
+
+
+        });
+    </script>
+
+
+    <!-- CSS -->
+    <style>
+        form {
+            width: 400px;
+            margin: 20px auto;
+            font-family: Arial, sans-serif;
+        }
+
+        .form-group {
+            margin-bottom: 10px;
+        }
+
+        label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        input, textarea {
+            width: 100%;
+            padding: 5px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            box-sizing: border-box;
+        }
+
+        textarea {
+            height: 100px;
+            resize: none;
+        }
+
+        button {
+            display: block;
+            width: 100%;
+            padding: 10px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+    </style>
+
+
+</body>
+</html>
+

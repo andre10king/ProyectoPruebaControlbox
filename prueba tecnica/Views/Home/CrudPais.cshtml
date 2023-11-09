@@ -1,0 +1,376 @@
+﻿﻿
+<!DOCTYPE html>
+<html ng-app="myApp">
+<head>
+    <title>Eliminar datos en AngularJS</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.9/angular.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="~/Scripts/angular.js"></script>
+    <script src="~/Scripts/App.js"></script>
+</head>
+<body ng-app="myApp" ng-controller="myCtrl">
+
+    <br />
+    <br />
+    <div ng-controller="myCtrl">
+
+        <h2 class="text-center">CRUD  pais</h2>
+
+        <form name="myForm" novalidate class="text-center">
+            <label for="id_pais">id_pais:</label>
+            <input type="text" id="id_pais" ng-disabled="true" ng-model="objetoParametros.id_pais"><br><br>
+
+            <label for="nombre">nombre:</label>
+            <input type="text" id="nombre" ng-model="objetoParametros.nombre"><br><br>
+
+
+
+            <button class="btn-danger" ng-click="submitForm(objetoParametros)">Guardar</button>
+            <br />
+            <button class="btn-success" ng-click="update(objetoParametros,a.id_pais)">Actualizar</button>
+            <br />
+            <button ng-click="limpiar(objetoParametros)">Limpiar</button>
+
+
+        </form>
+
+
+
+        <table class="table">
+            <tr>
+                <th>
+                    Id
+                </th>
+                <th>
+                    Descripcion
+                </th>
+
+
+                <th>
+                    Eliminar
+                </th>
+
+
+            </tr>
+
+
+            <tr ng-repeat="a in articulos2 " ng-click="seleccionarPersona(a)">
+
+
+                <td>
+                    {{a.id_pais}}
+
+
+
+
+                </td>
+                <td>
+                    {{a.nombre}}
+
+
+
+
+                </td>
+
+
+
+
+                <td>
+                    <button class="btn-danger" ng-click=" deleteItem(a);delete(a.id_pais) ">Eliminar</button>
+
+                </td>
+
+
+            </tr>
+
+
+        </table>
+
+
+
+
+
+
+
+        @*<form>
+            <input type="text" ng-disabled="true" ng-model="objetoParametros.Id">
+            <input type="text" ng-model="objetoParametros.Descripcion">
+            <input type="text" ng-model="objetoParametros.Marca">
+            <input type="text" ng-model="objetoParametros.Cantidad">
+            <input type="text" ng-model="objetoParametros.Precio">
+            <button ng-click="update(objetoParametros,a.Id)">Actualizar</button>
+            <button ng-click="limpiar(objetoParametros)">Limpiar</button>
+
+        </form>*@
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    </div>
+    <script>
+        var app = angular.module('myApp', []);
+        app.controller('myCtrl', function ($scope, $http) {
+
+
+            $scope.objetoParametros = {
+                id_pais: '',
+                nombre: '',
+
+
+            };
+
+
+            //eliminar
+            //$scope.delete = function (id) {
+            //    const swalWithBootstrapButtons = Swal.mixin({
+            //        customClass: {
+            //            confirmButton: "btn btn-success",
+            //            cancelButton: "btn btn-danger"
+            //        },
+            //        buttonsStyling: false
+            //    });
+            //    swalWithBootstrapButtons.fire({
+            //        title: "Estas seguro?",
+            //        text: "No podrás revertir esto!",
+            //        icon: "warning",
+            //        showCancelButton: true,
+            //        confirmButtonText: "Sí, elimínalo!",
+            //        cancelButtonText: "No, cancelar!",
+            //        reverseButtons: true
+            //    }).then((result) => {
+            //        if (result.isConfirmed) {
+            //            $http.delete('/api/Pais/' + id)
+            //                .success(function (data) {
+            //                    console.log(data);
+
+            //                })
+            //                .error(function (data) {
+            //                    console.log('Error: ' + data);
+            //                });
+
+            //            swalWithBootstrapButtons.fire({
+            //                title: "Borrado!",
+            //                text: "Su archivo ha sido eliminado.",
+            //                icon: "success"
+            //            });
+            //        } else if (
+            //            /* Read more about handling dismissals below */
+            //            result.dismiss === Swal.DismissReason.cancel
+            //        ) {
+            //            swalWithBootstrapButtons.fire({
+            //                title: "Cancelado",
+            //                text: "Tu dato  está a salvo :)",
+            //                icon: "error"
+            //            });
+            //        }
+            //    });
+         
+            //};
+
+
+
+
+            $scope.delete = function (id) {
+                $http.delete('/api/Pais/' + id)
+                    .success(function (data) {
+                        console.log(data);
+
+                    })
+                    .error(function (data) {
+                        console.log('Error: ' + data);
+                    });
+
+
+                
+
+            };
+
+
+            $scope.deleteItem = function (a) {
+                var index = $scope.articulos2.indexOf(a);
+                $scope.articulos2.splice(index, 1);
+
+            };
+
+
+            $scope.limpiar = function (objetoParametros) {
+                objetoParametros.id_pais = '',
+                    objetoParametros.nombre = ''
+
+
+            };
+
+
+
+
+            $http.get('/api/Pais').then(function (response) {
+
+                $scope.articulos2 = response.data;
+
+            });
+
+            $scope.seleccionarPersona = function (a) {
+                
+                $scope.objetoParametros = a;
+            };
+
+
+
+
+
+
+
+            //agregar
+            $scope.submitForm = function (parametros) {
+                
+
+                if (parametros.nombre !='') {
+
+                    
+
+                    var data = {
+                        /*id: $scope.Id,*/
+                        Nombre: parametros.nombre
+                    };
+                    $http.post('/api/Pais', data).then(function (response) {
+
+                        console.log(response.data);
+                        $scope.articulos2.push(response.data);
+                    });
+
+
+
+
+                    Swal.fire({
+                        position: 'top-center',
+                        icon: 'success',
+                        title: 'guardado con exito',
+                        showConfirmButton: false,
+                        timer: 2000
+
+                    })
+
+                }
+
+                else {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Oops...',
+                        text: 'Porfavor llenar todos los campos!',
+                       
+                    })
+                }
+
+            };
+
+
+
+
+            $scope.update = function (parametros, id) {
+
+                if (parametros.nombre != '') {
+                    
+                    Id_pais: parametros.id_pais,
+
+
+
+                        $http.put('/api/Pais/' + parametros.id_pais, parametros).then(function (response) {
+                            console.log('Object updated successfully!');
+                        }, function (error) {
+                            console.error('Error updating object:', error);
+                        });
+
+
+                    Swal.fire({
+                        position: 'top-center',
+                        icon: 'success',
+                        title: 'actualizado con exito',
+                        showConfirmButton: false,
+                        timer: 2000
+
+                    })
+                }
+
+                else {
+
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Oops...',
+                        text: 'Todos los campos deben estar llenos!',
+
+                    })
+
+                }
+
+              
+
+            };
+
+
+
+
+
+        });
+    </script>
+
+
+    <!-- CSS -->
+    <style>
+        form {
+            width: 400px;
+            margin: 20px auto;
+            font-family: Arial, sans-serif;
+        }
+
+        .form-group {
+            margin-bottom: 10px;
+        }
+
+        label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        input, textarea {
+            width: 100%;
+            padding: 5px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            box-sizing: border-box;
+        }
+
+        textarea {
+            height: 100px;
+            resize: none;
+        }
+
+        button {
+            display: block;
+            width: 100%;
+            padding: 10px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+    </style>
+
+
+</body>
+</html>
+

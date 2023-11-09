@@ -1,0 +1,272 @@
+﻿
+<!DOCTYPE html>
+<html ng-app="myApp">
+<head>
+    <title>Eliminar datos en AngularJS</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.9/angular.min.js"></script>
+</head>
+<body ng-app="myApp" ng-controller="myCtrl">
+
+
+    <div ng-controller="myCtrl">
+        <br />
+        <br />
+        <h2 class="text-center">Consulta tabla giro</h2>
+        <br />
+
+        <select ng-model="selectedCountry" ng-options=" PAISES.id_pais as    PAISES.nombre for PAISES in paises">
+            <option value="">Selecciona una pais</option>
+        </select>
+
+
+        <select ng-model="selectedCity" ng-options=" CIUDADES.id_ciudad as    CIUDADES.nombre for CIUDADES in cities" ng-disabled="!selectedCountry">
+            <option value="">Selecciona una ciudad</option>
+        </select>
+
+
+
+
+
+        <table class="table">
+            <tr>
+                <th>
+                    Id
+                </th>
+                <th>
+                    Descripcion
+                </th>
+
+
+                <th>
+                    id_ciudad
+                </th>
+
+
+            </tr>
+
+
+            <tr ng-repeat="a in articulos2 " >
+
+
+                <td>
+                    {{a.GIR_GIRO_ID}}
+
+
+
+
+                </td>
+                <td>
+                    {{a.GIR_RECIBO}}
+
+
+
+
+                </td>
+
+
+                <td>
+                    {{a.GIR_CIUDAD_ID}}
+
+
+
+
+                </td>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+            </tr>
+
+
+        </table>
+
+
+
+
+
+
+
+        @*<form>
+            <input type="text" ng-disabled="true" ng-model="objetoParametros.Id">
+            <input type="text" ng-model="objetoParametros.Descripcion">
+            <input type="text" ng-model="objetoParametros.Marca">
+            <input type="text" ng-model="objetoParametros.Cantidad">
+            <input type="text" ng-model="objetoParametros.Precio">
+            <button ng-click="update(objetoParametros,a.Id)">Actualizar</button>
+            <button ng-click="limpiar(objetoParametros)">Limpiar</button>
+
+        </form>*@
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    </div>
+    <script>
+        var app = angular.module('myApp', []);
+        app.controller('myCtrl', function ($scope, $http) {
+
+
+            $scope.paises = [];
+            $scope.cities = [];
+            $scope.articulos2 = [];
+
+
+
+            $http.get('/api/Giro').then(function (response) {
+
+                $scope.articulos2 = response.data;
+
+            });
+
+
+
+
+            $http.get('/api/Pais').then(function (response) {
+
+                $scope.paises = response.data;
+
+            });
+
+
+
+
+            $http.get('/api/Ciudad').then(function (response) {
+                
+                $scope.cities = response.data;
+
+            });
+
+
+
+
+
+         
+
+
+
+ //nuevas opciones
+
+            $scope.$watch('selectedCountry', function () {
+                
+                if ($scope.selectedCountry) {
+                    $http.get('/api/Ciudad?id_pais=' + $scope.selectedCountry).then(function (response) {
+                        $scope.cities = response.data;
+                    });
+                }
+                else {
+                    $scope.cities = [];
+                }
+            });
+
+
+
+
+            $scope.$watch('selectedCity', function () {
+          
+                
+                if ($scope.selectedCity) {
+                    $http.get('/api/Giro?GIR_CIUDAD_ID=' + $scope.selectedCity).then(function (response) {
+                        $scope.cities = response.data;
+                        $scope.articulos2 = $scope.cities;
+                     
+               
+                    });
+                }
+                else {
+                    $scope.cities = [];
+                }
+            });
+
+
+     
+
+
+
+
+      
+
+
+
+
+
+  
+
+
+        });
+    </script>
+
+
+    <!-- CSS -->
+    <style>
+        form {
+            width: 400px;
+            margin: 20px auto;
+            font-family: Arial, sans-serif;
+        }
+
+        .form-group {
+            margin-bottom: 10px;
+        }
+
+        label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        input, textarea {
+            width: 100%;
+            padding: 5px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            box-sizing: border-box;
+        }
+
+        textarea {
+            height: 100px;
+            resize: none;
+        }
+
+        button {
+            display: block;
+            width: 100%;
+            padding: 10px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+    </style>
+
+
+</body>
+</html>
+
